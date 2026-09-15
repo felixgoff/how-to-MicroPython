@@ -32,14 +32,18 @@ jobs:
       uses: actions/upload-pages-artifact@v5.0.0
       with:
         # Artifact name
-        name: # optional, default is github-pages
+        name: github-pages # optional, default is github-pages
         # Path of the directory containing the static assets.
         path: dist/ # default is _site/
         # Duration after which artifact will expire in days.
         retention-days: # optional, default is 1
         # Include hidden files and directories (those starting with a dot) in the artifact. Excludes .git and .github regardless.
         include-hidden-files: # optional, default is false
-    - name: Deploy GitHub Pages site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy GitHub Pages site
       uses: actions/deploy-pages@v5.0.1
       with:
         # GitHub token
@@ -51,7 +55,7 @@ jobs:
         # Initial time between deployment status reports; successful polls use capped backoff and jitter, with error backoff added separately (default: 5 seconds)
         reporting_interval: # optional, default is 5000
         # Name of the artifact to deploy
-        artifact_name: # optional, default is github-pages
+        artifact_name: github-pages # optional, default is github-pages
         # Is this attempting to deploy a pull request as a GitHub Pages preview site? (NOTE: This feature is only in alpha currently and is not available to the public!)
         preview: # optional, default is false
         
