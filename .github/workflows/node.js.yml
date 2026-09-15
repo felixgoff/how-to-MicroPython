@@ -1,0 +1,57 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    - name: Install dependencies
+      run: bun install --frozen-lockfile
+
+    - name: Svelte / Type Check
+      run: bun run check --if-present
+
+    - name: Build Vite App
+      run: bun run build
+    - name: Upload GitHub Pages artifact
+      uses: actions/upload-pages-artifact@v5.0.0
+      with:
+        # Artifact name
+        name: # optional, default is github-pages
+        # Path of the directory containing the static assets.
+        path: dist/ # default is _site/
+        # Duration after which artifact will expire in days.
+        retention-days: # optional, default is 1
+        # Include hidden files and directories (those starting with a dot) in the artifact. Excludes .git and .github regardless.
+        include-hidden-files: # optional, default is false
+    - name: Deploy GitHub Pages site
+      uses: actions/deploy-pages@v5.0.1
+      with:
+        # GitHub token
+        token: # default is ${{ github.token }}
+        # Time in milliseconds after which to timeout and cancel the deployment (default: 10 minutes)
+        timeout: # optional, default is 600000
+        # Maximum number of status report errors before cancelling a deployment (default: 10)
+        error_count: # optional, default is 10
+        # Initial time between deployment status reports; successful polls use capped backoff and jitter, with error backoff added separately (default: 5 seconds)
+        reporting_interval: # optional, default is 5000
+        # Name of the artifact to deploy
+        artifact_name: # optional, default is github-pages
+        # Is this attempting to deploy a pull request as a GitHub Pages preview site? (NOTE: This feature is only in alpha currently and is not available to the public!)
+        preview: # optional, default is false
+        
