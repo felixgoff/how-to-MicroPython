@@ -40,8 +40,8 @@ jobs:
         # Include hidden files and directories (those starting with a dot) in the artifact. Excludes .git and .github regardless.
         include-hidden-files: # optional, default is false
   deploy:
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Deploy GitHub Pages site
       uses: actions/deploy-pages@v5.0.1
