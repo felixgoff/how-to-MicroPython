@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Skärmbilder från scripts/check-components.mjs
+scripts/shots
+scripts/*.png
