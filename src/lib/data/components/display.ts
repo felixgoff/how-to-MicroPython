@@ -1,5 +1,5 @@
 import { nextToPico } from "$lib/wiring/geometry.js";
-import ssd1306Driver from "$lib/sim/drivers/ssd1306.py?raw";
+import { drivers } from "$lib/sim/drivers/index.js";
 import type { ComponentGuide } from "./types.js";
 
 const power = nextToPico(36); // 3V3(OUT)
@@ -28,7 +28,7 @@ export const display: ComponentGuide = {
 		"En OLED-skärm består av små lysdioder, en per pixel. Den här har 128 × 64 pixlar, som var och en kan vara tänd eller släckt. Skärmen har ett eget minne med alla pixlar, och SSD1306-kretsen på kortet ritar ut det.",
 		"Picon pratar med skärmen över I2C, en buss med två trådar: SDA för data och SCL för klockan. Varje enhet på bussen har en adress – skärmen har oftast 0x3C – så flera sensorer och skärmar kan dela på samma två trådar.",
 		"Du ritar i en kopia av bildminnet i Picon med text(), line(), rect() och fill(). Inget syns på skärmen förrän du anropar show(), som skickar hela bilden över I2C på en gång.",
-		"Drivrutinen ssd1306.py följer inte med MicroPython. I Thonny installerar du den via Verktyg → Hantera paket: sök på ssd1306 och installera. Simulatorn på den här sidan lägger den på kortet åt dig.",
+		"Drivrutinen ssd1306.py följer inte med MicroPython. Du behöver inte installera den själv: när koden importerar ssd1306 lägger Kodlabbet drivrutinen på kortet åt dig – både i simulatorn och på en riktig Pico WH.",
 	],
 	diagram: {
 		description:
@@ -131,7 +131,7 @@ while True:
     time.sleep(1)
 `,
 		notes: [
-			{ lines: "2", text: "Drivrutinen ssd1306 måste finnas på Picon. Installera den i Thonny via Verktyg → Hantera paket." },
+			{ lines: "2", text: "Drivrutinen ssd1306 måste finnas på Picon. Kodlabbet lägger den där automatiskt när koden importerar den." },
 			{ lines: "5", text: "I2C(0, …) väljer buss 0 på GP20 och GP21. 400 kHz är en snabb men säker hastighet för skärmen." },
 			{ lines: "6", text: "scan() listar adresserna till alla enheter som svarar på bussen – ett bra första test." },
 			{ lines: "10–13", text: "Rita i minnet med fill(), text() och hline(). Koordinaterna räknas från övre vänstra hörnet: x åt höger, y nedåt." },
@@ -141,7 +141,7 @@ while True:
 	pitfalls: [
 		{
 			title: "ImportError: no module named 'ssd1306'",
-			text: "Drivrutinen är inte installerad. I Thonny: Verktyg → Hantera paket, sök på ssd1306 och installera. Den hamnar då i mappen lib på Picon.",
+			text: "Drivrutinen saknas på kortet. Kör koden med Kör på Picon eller Spara som main.py i Kodlabbet – då lägger Kodlabbet ssd1306.py på kortet innan koden startar.",
 		},
 		{
 			title: "i2c.scan() ger en tom lista",
@@ -166,7 +166,7 @@ while True:
 	],
 	sim: {
 		devices: [{ kind: "ssd1306", address: 0x3c, sda: 20, scl: 21 }],
-		files: { "ssd1306.py": ssd1306Driver },
+		files: { "ssd1306.py": drivers["ssd1306.py"] },
 		display: true,
 	},
 };

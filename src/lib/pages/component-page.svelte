@@ -3,6 +3,8 @@
 	import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
+	import FlaskConicalIcon from "@lucide/svelte/icons/flask-conical";
+	import { openInLab } from "$lib/lab.js";
 	import WiringDiagram from "$lib/components/wiring-diagram.svelte";
 	import CodeBlock from "$lib/components/code-block.svelte";
 	import ComponentTester from "$lib/components/component-tester.svelte";
@@ -24,6 +26,7 @@
 		{ id: "koden", label: "Koden" },
 		{ id: "felsok", label: "Felsök" },
 		{ id: "testa", label: "Testa" },
+		{ id: "riktig-pico", label: "Kör på Pico" },
 	];
 </script>
 
@@ -122,7 +125,18 @@
 	<section id="koden" aria-labelledby="koden-rubrik" class="flex scroll-mt-20 flex-col gap-6">
 		<h2 id="koden-rubrik" class="text-2xl font-bold tracking-tight">Koden</h2>
 		<div class="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-			<CodeBlock code={guide.code.source} filename={guide.code.filename} />
+			<div class="flex min-w-0 flex-col items-start gap-4">
+				<div class="w-full">
+					<CodeBlock code={guide.code.source} filename={guide.code.filename} />
+				</div>
+				<p class="text-sm text-muted-foreground">
+					Vill du köra koden på ett riktigt kort? Öppna den i Kodlabbet, anslut Picon och tryck på Kör på Picon.
+				</p>
+				<Button onclick={() => openInLab(guide.code.source)} variant="outline" size="sm">
+					<FlaskConicalIcon />
+					Öppna i Kodlabbet
+				</Button>
+			</div>
 			<dl class="flex flex-col gap-4">
 				{#each guide.code.notes as note (note.lines)}
 					<div class="grid grid-cols-[4.5rem_1fr] gap-3">

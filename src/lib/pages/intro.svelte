@@ -11,7 +11,11 @@
 	import * as Kbd from "$lib/components/ui/kbd/index.js";
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
+	import FlaskConicalIcon from "@lucide/svelte/icons/flask-conical";
+	import { Button } from "$lib/components/ui/button/index.js";
 	import { componentGuides } from "$lib/data/components/index.js";
+	import { examples } from "$lib/sim/examples.js";
+	import { openInLab } from "$lib/lab.js";
 
 	const facts = [
 		{ icon: CpuIcon, title: "RP2040-chip", text: "Dubbelkärnig ARM Cortex-M0+ på 133 MHz med 264 kB RAM och 2 MB flashminne." },
@@ -103,9 +107,10 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 
 	<section id="kom-igang" aria-labelledby="kom-igang-rubrik" class="flex scroll-mt-20 flex-col gap-6">
 		<div class="flex flex-col gap-2">
-			<h2 id="kom-igang-rubrik" class="text-2xl font-bold tracking-tight">Snabbguide: MicroPython och Thonny</h2>
+			<h2 id="kom-igang-rubrik" class="text-2xl font-bold tracking-tight">Snabbguide: Kom igång med Kodlabbet</h2>
 			<p class="max-w-3xl text-muted-foreground">
-				Thonny är en enkel Python-editor som kan prata direkt med Picon. Så här får du igång ditt första program.
+				Kodlabbet är sidans egen kodeditor. Där testar du koden i en simulerad Pico WH, och skickar den sedan till ett
+				riktigt kort via USB – direkt från webbläsaren, utan att installera något program.
 			</p>
 		</div>
 
@@ -114,12 +119,18 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 				<Card.Root size="sm">
 					<Card.Header>
 						<Card.Description>Steg 1</Card.Description>
-						<Card.Title>Installera Thonny</Card.Title>
+						<Card.Title>Testa utan kort</Card.Title>
 					</Card.Header>
-					<Card.Content class="text-muted-foreground">
-						Ladda ner och installera Thonny från
-						<a href="https://thonny.org" class="font-medium text-primary underline underline-offset-4">thonny.org</a>.
-						Det finns för Windows, macOS och Linux.
+					<Card.Content class="flex flex-col items-start gap-4 text-muted-foreground">
+						<p>
+							Öppna Kodlabbet och tryck på <strong class="text-foreground">Kör</strong>. MicroPython startar i en
+							simulerad Pico WH och lysdioden på GP15 börjar blinka. Allt händer i webbläsaren, så du kan prova redan
+							innan du har ett kort framför dig.
+						</p>
+						<Button onclick={() => openInLab(examples[0].code)} size="sm">
+							<FlaskConicalIcon />
+							Öppna Kodlabbet
+						</Button>
 					</Card.Content>
 				</Card.Root>
 			</li>
@@ -127,12 +138,53 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 				<Card.Root size="sm">
 					<Card.Header>
 						<Card.Description>Steg 2</Card.Description>
-						<Card.Title>Anslut Picon i BOOTSEL-läge</Card.Title>
+						<Card.Title>Installera MicroPython på Picon</Card.Title>
 					</Card.Header>
-					<Card.Content class="text-muted-foreground">
-						Håll in den vita <strong class="text-foreground">BOOTSEL</strong>-knappen på kortet medan du kopplar in
-						micro-USB-kabeln. Släpp knappen – Picon dyker upp som en USB-enhet som heter {@render inlineCode("RPI-RP2")}. Det
-						här behövs bara första gången.
+					<Card.Content class="flex flex-col gap-3 text-muted-foreground">
+						<p>
+							Ett nytt kort har inget MicroPython. Håll in den vita <strong class="text-foreground">BOOTSEL</strong>-knappen
+							medan du kopplar in micro-USB-sladden, och släpp den sedan. Picon dyker upp som en USB-enhet, som en
+							USB-sticka.
+						</p>
+						<p>
+							Ladda ner rätt {@render inlineCode(".uf2")}-fil för <strong class="text-foreground">just din modell</strong>
+							och dra den till enheten. Picon startar om och enheten försvinner – då är MicroPython installerat. Det här
+							behövs bara en gång per kort.
+						</p>
+						<div class="overflow-x-auto border">
+							<table class="w-full text-left text-sm">
+								<thead class="bg-muted/50 text-foreground">
+									<tr>
+										<th scope="col" class="px-3 py-2 font-semibold">Ditt kort</th>
+										<th scope="col" class="px-3 py-2 font-semibold">Ladda ner</th>
+										<th scope="col" class="px-3 py-2 font-semibold">Enheten heter</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each [
+										{ board: "Pico W / Pico WH", id: "RPI_PICO_W", drive: "RPI-RP2" },
+										{ board: "Pico 2 W", id: "RPI_PICO2_W", drive: "RP2350" },
+										{ board: "Pico 2", id: "RPI_PICO2", drive: "RP2350" },
+									] as row (row.id)}
+										<tr class="border-t">
+											<th scope="row" class="px-3 py-2 font-medium text-foreground">{row.board}</th>
+											<td class="px-3 py-2">
+												<a
+													href={`https://micropython.org/download/${row.id}/`}
+													class="font-mono text-primary underline underline-offset-4">{row.id}</a
+												>
+											</td>
+											<td class="px-3 py-2 font-mono">{row.drive}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+						<p>
+							Välj en fil med <strong class="text-foreground">W</strong> i namnet om kortet har WiFi – bara den har
+							drivrutinen för WiFi-chippet, som också styr den inbyggda lampan. Filerna är inte utbytbara mellan Pico och
+							Pico 2: de har olika processorer, och Pico 2 tar inte emot en fil som byggts för Pico.
+						</p>
 					</Card.Content>
 				</Card.Root>
 			</li>
@@ -140,13 +192,11 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 				<Card.Root size="sm">
 					<Card.Header>
 						<Card.Description>Steg 3</Card.Description>
-						<Card.Title>Installera MicroPython</Card.Title>
+						<Card.Title>Använd Chrome eller Edge</Card.Title>
 					</Card.Header>
 					<Card.Content class="text-muted-foreground">
-						Klicka på tolk-väljaren längst ned till höger i Thonny och välj
-						<strong class="text-foreground">Configure interpreter… → Install or update MicroPython</strong>. Välj
-						varianten <em>Raspberry Pi Pico W / Pico WH</em> – den innehåller drivrutinen för WiFi-chippet, som också
-						styr den inbyggda lampan. Klicka sedan <strong class="text-foreground">Install</strong>.
+						Kodlabbet pratar med kortet via Web Serial, som bara finns i Chrome och Edge på dator. I andra webbläsare
+						fungerar simulatorn som vanligt, men inte ett riktigt kort.
 					</Card.Content>
 				</Card.Root>
 			</li>
@@ -154,13 +204,12 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 				<Card.Root size="sm">
 					<Card.Header>
 						<Card.Description>Steg 4</Card.Description>
-						<Card.Title>Välj tolk</Card.Title>
+						<Card.Title>Anslut kortet</Card.Title>
 					</Card.Header>
 					<Card.Content class="text-muted-foreground">
-						Välj <strong class="text-foreground">MicroPython (Raspberry Pi Pico)</strong> i samma meny – samma val
-						gäller för Pico WH. I skalet (Shell)
-						längst ned ska du nu se {@render inlineCode(">>>")} – då är Picon redo. Testa att skriva
-						{@render inlineCode('print("Hej!")')}.
+						Längst ned i Kodlabbet, under <strong class="text-foreground">Kör på en riktig Pico WH</strong>, trycker du på
+						<strong class="text-foreground">Anslut Pico WH</strong>. Webbläsaren visar en lista där bara Pico-kort finns
+						med – välj ditt och tryck på Anslut. När kortet är anslutet syns allt det skriver ut i konsolen under knapparna.
 					</Card.Content>
 				</Card.Root>
 			</li>
@@ -168,14 +217,21 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 				<Card.Root size="sm">
 					<Card.Header>
 						<Card.Description>Steg 5</Card.Description>
-						<Card.Title>Kör ditt första program</Card.Title>
+						<Card.Title>Kör ditt första program på kortet</Card.Title>
 					</Card.Header>
-					<Card.Content class="flex flex-col gap-4 text-muted-foreground">
+					<Card.Content class="flex flex-col items-start gap-4 text-muted-foreground">
 						<p>
-							Klistra in koden nedan och tryck på den gröna <strong class="text-foreground">Run</strong>-knappen
-							(<Kbd.Root>F5</Kbd.Root>). Lampan på kortet börjar blinka.
+							Öppna koden nedan i Kodlabbet och tryck på <strong class="text-foreground">Kör på Picon</strong>. Lampan på
+							kortet börjar blinka. Den inbyggda lampan styrs av WiFi-chippet, så den syns bara på ett riktigt kort –
+							inte i simulatorn.
 						</p>
-						<CodeBlock code={blink} filename="main.py" />
+						<div class="w-full">
+							<CodeBlock code={blink} filename="main.py" />
+						</div>
+						<Button onclick={() => openInLab(blink)} variant="outline" size="sm">
+							<FlaskConicalIcon />
+							Öppna i Kodlabbet
+						</Button>
 					</Card.Content>
 				</Card.Root>
 			</li>
@@ -186,9 +242,10 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 						<Card.Title>Spara på Picon</Card.Title>
 					</Card.Header>
 					<Card.Content class="text-muted-foreground">
-						Välj <strong class="text-foreground">File → Save as… → Raspberry Pi Pico</strong> och döp filen till
-						{@render inlineCode("main.py")}. Då startar programmet automatiskt varje gång Picon får ström – även utan
-						dator.
+						Tryck på <strong class="text-foreground">Spara som main.py</strong>. Då ligger koden kvar på kortet och
+						startar av sig själv varje gång Picon får ström – även utan dator. Med
+						<strong class="text-foreground">Avbryt</strong> stoppar du programmet och med
+						<strong class="text-foreground">Starta om</strong> startar kortet om.
 					</Card.Content>
 				</Card.Root>
 			</li>
@@ -199,9 +256,15 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 			<Alert.Title>Tips vid problem</Alert.Title>
 			<Alert.Description>
 				<ul class="list-disc pl-5">
-					<li>Syns ingen enhet? Prova en annan USB-kabel – vissa kablar klarar bara laddning, inte data.</li>
-					<li>Står det att enheten är upptagen? Tryck på den röda Stop-knappen i Thonny och försök igen.</li>
-					<li>Koppla alltid bort strömmen innan du ändrar något på kopplingsplattan.</li>
+					<li>
+						Visas inget kort i listan? Prova en annan USB-sladd – vissa klarar bara laddning, inte data. Kontrollera också
+						att MicroPython är installerat (steg 2).
+					</li>
+					<li>
+						Går kortet inte att ansluta? Ett annat program eller en annan flik använder det redan. Stäng det och försök
+						igen.
+					</li>
+					<li>Koppla alltid bort USB-sladden innan du ändrar något på kopplingsdäcket.</li>
 				</ul>
 			</Alert.Description>
 		</Alert.Root>
@@ -217,16 +280,22 @@ print("Ansluten! IP:", wlan.ifconfig()[0])
 			</p>
 		</div>
 
-		<div class="max-w-3xl">
-			<CodeBlock code={wifi} filename="wifi.py" />
+		<div class="flex max-w-3xl flex-col items-start gap-4">
+			<div class="w-full">
+				<CodeBlock code={wifi} filename="wifi.py" />
+			</div>
+			<Button onclick={() => openInLab(wifi)} variant="outline" size="sm">
+				<FlaskConicalIcon />
+				Öppna i Kodlabbet
+			</Button>
 		</div>
 
 		<Alert.Root role="note" class="max-w-3xl">
 			<WifiIcon />
 			<Alert.Title>Kör bara på ett riktigt kort</Alert.Title>
 			<Alert.Description>
-				WiFi-chippet finns inte i simulatorn i kodlabbet – den härmar bara RP2040:an. Koden ovan behöver alltså en
-				riktig Pico WH. Samma sak gäller den inbyggda lampan, som ju styrs av WiFi-chippet.
+				WiFi-chippet finns inte i Kodlabbets simulator – den härmar bara RP2040:an. Ändra nätverkets namn och lösenord,
+				anslut en Pico WH och tryck på Kör på Picon. Samma sak gäller den inbyggda lampan, som ju styrs av WiFi-chippet.
 			</Alert.Description>
 		</Alert.Root>
 	</section>

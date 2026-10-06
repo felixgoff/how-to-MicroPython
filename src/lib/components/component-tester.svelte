@@ -8,6 +8,7 @@
 	import TriangleAlertIcon from "@lucide/svelte/icons/triangle-alert";
 	import CodeEditor from "$lib/components/code-editor.svelte";
 	import SerialConsole from "$lib/components/serial-console.svelte";
+	import DevicePanel from "$lib/components/device-panel.svelte";
 	import VirtualBoard from "$lib/components/virtual-board.svelte";
 	import SensorControls from "$lib/components/sensor-controls.svelte";
 	import OledScreen from "$lib/components/oled-screen.svelte";
@@ -158,6 +159,24 @@
 		/>
 	</div>
 </Card.Root>
+
+<section id="riktig-pico" aria-labelledby="riktig-pico-rubrik" class="mt-12 flex scroll-mt-20 flex-col gap-4">
+	<div class="flex flex-col gap-2">
+		<h3 id="riktig-pico-rubrik" class="text-xl font-bold tracking-tight">Kör på en riktig Pico WH</h3>
+		<p class="max-w-3xl text-muted-foreground">
+			Har du kopplat komponenten som i schemat ovan? Anslut Picon med USB och kör koden från editorn – med dina
+			ändringar – direkt på kortet.
+			{#if guide.sim.files}
+				Drivrutinen som koden behöver lägger Kodlabbet på kortet åt dig.
+			{/if}
+			{#if controls.length > 0}
+				Reglagen ovan styr bara simulatorn: på ett riktigt kort mäter sensorn på riktigt.
+			{/if}
+			Kräver Chrome eller Edge på dator.
+		</p>
+	</div>
+	<DevicePanel {code} />
+</section>
 
 <style>
 	/* Ljudvågor från sensorn mot föremålet */

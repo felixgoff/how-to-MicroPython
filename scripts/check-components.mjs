@@ -38,7 +38,8 @@ for (const [slug, pattern] of Object.entries(expected)) {
 	const tester = page.locator("#testa");
 	await tester.scrollIntoViewIfNeeded();
 	await tester.getByRole("button", { name: "Kör", exact: true }).click();
-	const log = tester.getByRole("log");
+	// Simulatorns konsol kommer först; "Kör på en riktig Pico" har en egen längre ned
+	const log = tester.getByRole("log").first();
 
 	let ok = false;
 	let detail = "";

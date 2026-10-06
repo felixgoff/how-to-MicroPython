@@ -3,8 +3,6 @@
 	import SquareIcon from "@lucide/svelte/icons/square";
 	import DownloadIcon from "@lucide/svelte/icons/download";
 	import FolderOpenIcon from "@lucide/svelte/icons/folder-open";
-	import UsbIcon from "@lucide/svelte/icons/usb";
-	import SaveIcon from "@lucide/svelte/icons/save";
 	import RotateCcwIcon from "@lucide/svelte/icons/rotate-ccw";
 	import CircuitBoardIcon from "@lucide/svelte/icons/circuit-board";
 	import FootprintsIcon from "@lucide/svelte/icons/footprints";
@@ -12,6 +10,7 @@
 	import WifiOffIcon from "@lucide/svelte/icons/wifi-off";
 	import CodeEditor from "$lib/components/code-editor.svelte";
 	import SerialConsole from "$lib/components/serial-console.svelte";
+	import DevicePanel from "$lib/components/device-panel.svelte";
 	import VirtualBoard from "$lib/components/virtual-board.svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
@@ -22,8 +21,8 @@
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Separator } from "$lib/components/ui/separator/index.js";
 	import { PicoSimulator } from "$lib/sim/pico-simulator.svelte.js";
-	import { PicoDevice } from "$lib/device/pico-device.svelte.js";
 	import { examples } from "$lib/sim/examples.js";
+	import { driversFor } from "$lib/sim/drivers/index.js";
 	import { defaultParts, type Part } from "$lib/sim/parts.js";
 	import { LAB_CODE_KEY } from "$lib/lab.js";
 
@@ -40,7 +39,6 @@
 	}
 
 	const simulator = new PicoSimulator();
-	const device = new PicoDevice();
 
 	// Stäng av emulatorn när man lämnar kodlabbet, så att den inte kör i bakgrunden
 	$effect(() => () => simulator.stop());
@@ -171,7 +169,7 @@
 					{/if}
 				</Card.Description>
 				<Card.Action class="flex items-center gap-1 self-center">
-					<Button size="sm" onclick={() => simulator.runCode(code, { trackLines })} disabled={simulator.status === "loading"}>
+					<Button size="sm" onclick={() => simulator.runCode(code, { trackLines, files: driversFor(code) })} disabled={simulator.status === "loading"}>
 						<PlayIcon />
 						Kör
 					</Button>
@@ -243,73 +241,13 @@
 			<h2 id="usb-rubrik" class="text-2xl font-bold tracking-tight">Kör på en riktig Pico WH</h2>
 			<p class="max-w-3xl text-muted-foreground">
 				Anslut en Pico WH med MicroPython till USB-porten. Webbläsaren frågar vilken enhet den får använda, sedan
-				skickas koden till kortet utan att du behöver öppna Thonny. Här fungerar även WiFi och den inbyggda lampan,
-				till skillnad från i simulatorn. Kräver Chrome eller Edge på dator.
+				skickas koden direkt till kortet. Behöver koden en drivrutin som inte följer med MicroPython, som ssd1306 för
+				OLED-skärmen, lägger Kodlabbet den på kortet åt dig. Här fungerar även WiFi och den inbyggda lampan, till
+				skillnad från i simulatorn. Kräver Chrome eller Edge på dator.
 			</p>
 		</div>
 
-		{#if !PicoDevice.supported}
-			<Alert.Root role="note">
-				<TriangleAlertIcon />
-				<Alert.Title>Webbläsaren stöder inte USB-anslutning</Alert.Title>
-				<Alert.Description>
-					Web Serial finns i Chrome och Edge på dator. I andra webbläsare fungerar simulatorn och nerladdningen som
-					vanligt – öppna den nerladdade filen i Thonny i stället.
-				</Alert.Description>
-			</Alert.Root>
-		{:else}
-			<div class="flex flex-wrap items-center gap-2">
-				{#if !device.connected}
-					<Button onclick={() => device.connect()} disabled={device.status === "connecting"}>
-						<UsbIcon />
-						Anslut Pico WH
-					</Button>
-				{:else}
-					<Button onclick={() => device.runCode(code)} disabled={device.status === "busy"}>
-						<PlayIcon />
-						Kör på Picon
-					</Button>
-					<Button variant="outline" onclick={() => device.saveAsMain(code)} disabled={device.status === "busy"}>
-						<SaveIcon />
-						Spara som main.py
-					</Button>
-					<Button variant="outline" onclick={() => device.interrupt()}>
-						<SquareIcon />
-						Avbryt
-					</Button>
-					<Button variant="outline" onclick={() => device.reset()}>
-						<RotateCcwIcon />
-						Starta om
-					</Button>
-					<Button variant="ghost" onclick={() => device.disconnect()}>Koppla från</Button>
-					<Badge variant="secondary">Ansluten</Badge>
-				{/if}
-			</div>
-
-			{#if device.error}
-				<Alert.Root variant="destructive">
-					<TriangleAlertIcon />
-					<Alert.Title>Något gick fel med anslutningen</Alert.Title>
-					<Alert.Description>{device.error}</Alert.Description>
-				</Alert.Root>
-			{/if}
-
-			<Card.Root size="sm" class="h-64 gap-0 py-0">
-				<Card.Header class="items-center border-b py-2 [.border-b]:pb-2">
-					<Card.Description>Konsol – Pico via USB</Card.Description>
-					<Card.Action class="self-center">
-						<Button variant="ghost" size="sm" onclick={() => device.clearOutput()}>Rensa</Button>
-					</Card.Action>
-				</Card.Header>
-				<Card.Content class="min-h-0 flex-1 px-0">
-					<SerialConsole
-						class="h-full"
-						text={device.output}
-						placeholder="Anslut ett kort för att se vad det skriver ut."
-					/>
-				</Card.Content>
-			</Card.Root>
-		{/if}
+		<DevicePanel {code} />
 	</section>
 
 	<input

@@ -1,7 +1,7 @@
 # SSD1306 OLED-drivrutin från micropython-lib (MIT-licens).
 # https://github.com/micropython/micropython-lib/tree/master/micropython/drivers/display/ssd1306
-# Den följer inte med MicroPython-firmwaren, så simulatorn lägger den på
-# det emulerade kortet innan koden körs – precis som man gör i Thonny.
+# Den följer inte med MicroPython-firmwaren, så Kodlabbet lägger den på
+# kortet – det simulerade eller ett riktigt – när koden importerar den.
 
 # MicroPython SSD1306 OLED driver, I2C and SPI interfaces
 

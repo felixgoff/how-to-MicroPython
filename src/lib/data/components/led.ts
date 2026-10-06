@@ -91,7 +91,7 @@ export const led: ComponentGuide = {
 			},
 			{
 				title: "Klart att testa",
-				text: "Kontrollera en gång till: långa benet mot GP15, motståndet mot GND. Anslut sedan USB-sladden och kör koden nedan – eller testa den direkt i simulatorn längst ned på sidan.",
+				text: "Kontrollera en gång till: långa benet mot GP15, motståndet mot GND. Anslut sedan USB-sladden, öppna koden nedan i Kodlabbet och tryck på Kör på Picon – eller testa den direkt i simulatorn längst ned på sidan.",
 				show: [],
 			},
 		],
