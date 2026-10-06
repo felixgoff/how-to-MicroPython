@@ -24,13 +24,13 @@
 from machine import Pin
 import time
 
-# Pa Pico WH sitter den inbyggda lampan pa WiFi-chippet.
-# Darfor skriver man "LED" i stallet for ett GPIO-nummer.
+# På Pico WH sitter den inbyggda lampan på WiFi-chippet.
+# Därför skriver man "LED" i stället för ett GPIO-nummer.
 led = Pin("LED", Pin.OUT)
 
 while True:
-    led.toggle()      # Vaxla mellan av och pa
-    time.sleep(0.5)   # Vanta en halv sekund
+    led.toggle()      # Växla mellan av och på
+    time.sleep(0.5)   # Vänta en halv sekund
 `;
 
 	const wifi = `
@@ -41,7 +41,7 @@ wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 wlan.connect("NATVERKETS_NAMN", "LOSENORD")
 
-# Vanta tills kortet fatt en IP-adress
+# Vänta tills kortet fått en IP-adress
 while not wlan.isconnected():
     print("Ansluter...")
     time.sleep(1)

@@ -25,8 +25,9 @@
 	import { PicoDevice } from "$lib/device/pico-device.svelte.js";
 	import { examples } from "$lib/sim/examples.js";
 	import { defaultParts, type Part } from "$lib/sim/parts.js";
+	import { LAB_CODE_KEY } from "$lib/lab.js";
 
-	const STORAGE_KEY = "playground-code";
+	const STORAGE_KEY = LAB_CODE_KEY;
 	const PARTS_KEY = "playground-parts";
 
 	function storedParts(): Part[] {
